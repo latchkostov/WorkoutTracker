@@ -1,0 +1,59 @@
+<div class="card">
+  <h5 class="card-header">
+    Exercises
+  </h5>
+  <div class="card-body">
+    <div *ngIf="exercises && exercises.length">
+      <div class="row">
+        <div class="input-group col-md-3">
+            <input class="form-control py-2 border-right-0 border" type="search" placeholder="Search" [(ngModel)]="searchValue">
+            <span class="input-group-append">
+                <div class="input-group-text bg-transparent"><i class="fa fa-search"></i></div>
+            </span>
+        </div>
+        <div class="col-md-3">
+            <p-multiSelect [options]="muscleGroups" [(ngModel)]="selectedMuscleGroups" 
+            [panelStyle]="{minWidth:'12em'}"></p-multiSelect>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-4">
+                <p-radioButton name="group2" value="All" label="All" [(ngModel)]="exerciseType" inputId="preopt1">
+                </p-radioButton>
+            </div>
+            <div class="col-md-4">
+              <p-radioButton name="group2" value="Compound" label="Compound" [(ngModel)]="exerciseType" inputId="preopt2">
+              </p-radioButton>
+            </div>
+            <div class="col-md-4">
+              <p-radioButton name="group2" value="Isolated" label="Isolated" [(ngModel)]="exerciseType" inputId="preopt3">
+              </p-radioButton>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+            
+      </div>
+      <br />
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Demonstration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let exercise of filteredExercises">
+            <td>{{exercise.id}}</td>
+            <td>{{exercise.name}}</td>
+            <td>{{exercise.description}}</td>
+            <td><a href="{{exercise.videoLink}}">{{exercise.videoLink}}</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

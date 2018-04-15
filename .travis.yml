@@ -1,0 +1,10 @@
+language: csharp
+mono: none
+dotnet: 2.0.3
+
+install:
+- dotnet restore WorkoutTracker.sln
+
+script:
+ - dotnet build src/WorkoutTracker.csproj
+ - dotnet test tests/WorkoutTracker.Test/WorkoutTracker.Test.csproj

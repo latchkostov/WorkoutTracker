@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  workout-tracker2:
+    image: workouttracker2
+    build:
+      context: .
+      dockerfile: Dockerfile
