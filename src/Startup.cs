@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WorkoutTracker.Services;
 
 namespace WorkoutTracker
 {
@@ -20,6 +21,8 @@ namespace WorkoutTracker
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddTransient<IExerciseService, ExerciseService>();
+            services.AddTransient<IMuscleGroupService, MuscleGroupService>();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

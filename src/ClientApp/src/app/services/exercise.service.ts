@@ -8,7 +8,7 @@ export class ExerciseService {
   constructor(private httpClient: HttpClient) { }
 
   getAllExercises() {
-    return this.httpClient.get<IExercise[]>('assets/sampleExercises.json');
+    return this.httpClient.get<IExercise[]>('api/exercises');
   }
 
 }

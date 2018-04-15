@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using WorkoutTracker.Services;
 
 namespace WorkoutTracker.Controllers
 {
@@ -11,6 +8,13 @@ namespace WorkoutTracker.Controllers
     [Route("api/Exercises")]
     public class ExercisesController : Controller
     {
+        private readonly IExerciseService _exerciseService;
+
+        public ExercisesController(IExerciseService exerciseService)
+        {
+            _exerciseService = exerciseService;
+        }
+        
         /// <summary>
         /// Retrieves a list of all of the exercises.
         /// </summary>
@@ -18,7 +22,7 @@ namespace WorkoutTracker.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllExercises()
         {
-            return Json(null);
+            return Json(await _exerciseService.GetAll());
         }
     }
 }

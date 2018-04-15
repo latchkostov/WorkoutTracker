@@ -8,7 +8,7 @@ export class MuscleGroupService {
   constructor(private httpClient: HttpClient) { }
 
   getAllMuscleGroups() {
-    return this.httpClient.get<MuscleGroup[]>('assets/sampleMuscleGroups.json');
+    return this.httpClient.get<MuscleGroup[]>('api/musclegroups');
   }
 
 }
