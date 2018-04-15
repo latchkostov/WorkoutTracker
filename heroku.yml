@@ -1,4 +1,4 @@
 build:
   docker:
-    web: src/Dockerfile
-    worker: src/Dockerfile
+    web: Dockerfile
+    worker: Dockerfile
