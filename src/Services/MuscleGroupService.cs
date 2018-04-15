@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WorkoutTracker.Infra;
 using WorkoutTracker.Models;
 
 namespace WorkoutTracker.Services
@@ -11,34 +13,22 @@ namespace WorkoutTracker.Services
     /// </summary>
     public class MuscleGroupService : IMuscleGroupService
     {
+        private readonly WorkoutTrackerContext _context;
+
+        public MuscleGroupService(WorkoutTrackerContext context)
+        {
+            _context = context;
+        }
+
         /// <summary>
         /// Retrives all muscle groups.
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<MuscleGroup>> GetAll()
         {
-            var result = new List<MuscleGroup>();
-
-            result.AddRange(new List<MuscleGroup>()
-            {
-                new MuscleGroup
-                {
-                    Id = 1,
-                    Name = "Chest"
-                },
-                new MuscleGroup
-                {
-                    Id = 2,
-                    Name = "Triceps"
-                },
-                new MuscleGroup
-                {
-                    Id = 3,
-                    Name = "Biceps"
-                }
-            });
-
-            return result;
+            return await _context.MuscleGroups
+                .Include(p => p.ExerciseMuscleGroups)
+                .ToListAsync();
         }
     }
 }

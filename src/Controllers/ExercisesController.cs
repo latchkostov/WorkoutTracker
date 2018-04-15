@@ -22,6 +22,7 @@ namespace WorkoutTracker.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllExercises()
         {
+            var result = await _exerciseService.GetAll();
             return Json(await _exerciseService.GetAll());
         }
     }

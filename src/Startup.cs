@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
+using WorkoutTracker.Infra;
 using WorkoutTracker.Services;
 
 namespace WorkoutTracker
@@ -20,7 +23,15 @@ namespace WorkoutTracker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(options => {
+                options.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
+            string connectionString = "Server=localhost;Database=WorkoutTracker;Username=admin;Password=password;";
+            services.AddEntityFrameworkNpgsql()
+                .AddDbContext<WorkoutTrackerContext>(options => options.UseNpgsql(connectionString));
+
             services.AddTransient<IExerciseService, ExerciseService>();
             services.AddTransient<IMuscleGroupService, MuscleGroupService>();
 
@@ -45,12 +56,6 @@ namespace WorkoutTracker
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-            //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-            //{
-            //    HotModuleReplacement = true,
-            //    HotModuleReplacementServerPort = 5000,
-            //    HotModuleReplacementEndpoint = "/dist/__webpack_hmr"
-            //});
 
             app.UseMvc(routes =>
             {
@@ -71,6 +76,22 @@ namespace WorkoutTracker
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+            SeedDatabase(app);
+        }
+
+        private void SeedDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var context =
+                    serviceScope.ServiceProvider.GetService<WorkoutTrackerContext>();
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                context.AddRange(SeedData.ExerciseMuscleGroups);
+                context.SaveChanges();
+            }
         }
     }
 }
