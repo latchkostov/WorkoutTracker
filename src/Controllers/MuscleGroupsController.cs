@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WorkoutTracker.Services;
 
@@ -26,7 +22,8 @@ namespace WorkoutTracker.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Json(await _muscleGroupService.GetAll());
+            var result = await _muscleGroupService.GetAll();
+            return Json(result);
         }
     }
 }

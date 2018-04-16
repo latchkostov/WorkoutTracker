@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace WorkoutTracker.Models
 {
-
     /// <summary>
     /// Exercise model.
     /// </summary>
@@ -23,9 +24,13 @@ namespace WorkoutTracker.Models
         /// </summary>
         public string VideoLink { get; set; }
 
+        [JsonIgnore]
+        public virtual ICollection<ExerciseMuscleGroupJoin> ExerciseMuscleGroups { get; set; } = 
+            new List<ExerciseMuscleGroupJoin>();
+
         /// <summary>
-        /// The muscle groups the exercise involves.
+        /// Join entities between exercrise and muscle groups.
         /// </summary>
-        public List<MuscleGroup> MuscleGroups { get; set; } = new List<MuscleGroup>();
+        public ICollection<MuscleGroup> MuscleGroups => ExerciseMuscleGroups.Select(x => x.MuscleGroup).ToList();
     }
 }

@@ -2,8 +2,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using WorkoutTracker.Infra;
 using WorkoutTracker.Services;
 
 namespace WorkoutTracker
@@ -20,7 +24,23 @@ namespace WorkoutTracker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(options => {
+                options.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
+            var DATABASE_URL = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+            if (String.IsNullOrWhiteSpace(DATABASE_URL))
+                throw new ArgumentException("DATABASE_URL environment variable required for Postgres SQL string.");
+
+            string connectionString = ConvertPostgresUrlToConnectionString(DATABASE_URL);
+
+            services.AddEntityFrameworkNpgsql()
+                .AddDbContext<WorkoutTrackerContext>(options => {
+                    options.UseNpgsql(connectionString);
+                });
+
             services.AddTransient<IExerciseService, ExerciseService>();
             services.AddTransient<IMuscleGroupService, MuscleGroupService>();
 
@@ -45,12 +65,6 @@ namespace WorkoutTracker
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-            //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-            //{
-            //    HotModuleReplacement = true,
-            //    HotModuleReplacementServerPort = 5000,
-            //    HotModuleReplacementEndpoint = "/dist/__webpack_hmr"
-            //});
 
             app.UseMvc(routes =>
             {
@@ -71,6 +85,19 @@ namespace WorkoutTracker
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+        }
+
+        private string ConvertPostgresUrlToConnectionString(string urlString)
+        {
+            if (Uri.TryCreate(urlString, UriKind.Absolute, out var uri))
+            {
+                var userInfo = uri.UserInfo.Split(':');
+                return $"host={uri.Host};username={userInfo[0]};password={userInfo[1]};database={uri.LocalPath.Substring(1)};pooling=true;";
+            }
+            else
+            {
+                throw new ArgumentException("Unable to parse Postgres SQL.", nameof(urlString));
+            }
         }
     }
 }
