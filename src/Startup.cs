@@ -37,7 +37,9 @@ namespace WorkoutTracker
             string connectionString = ConvertPostgresUrlToConnectionString(DATABASE_URL);
 
             services.AddEntityFrameworkNpgsql()
-                .AddDbContext<WorkoutTrackerContext>(options => options.UseNpgsql(connectionString));
+                .AddDbContext<WorkoutTrackerContext>(options => {
+                    options.UseNpgsql(connectionString);
+                });
 
             services.AddTransient<IExerciseService, ExerciseService>();
             services.AddTransient<IMuscleGroupService, MuscleGroupService>();
@@ -83,13 +85,6 @@ namespace WorkoutTracker
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-
-            var SEED_DATABASE = Environment.GetEnvironmentVariable("SEED_DATABASE");
-
-            if (!String.IsNullOrWhiteSpace(SEED_DATABASE) && SEED_DATABASE.Equals("true", StringComparison.CurrentCultureIgnoreCase))
-            {
-                SeedDatabase(app);
-            }
         }
 
         private string ConvertPostgresUrlToConnectionString(string urlString)
@@ -102,27 +97,6 @@ namespace WorkoutTracker
             else
             {
                 throw new ArgumentException("Unable to parse Postgres SQL.", nameof(urlString));
-            }
-        }
-
-        private void SeedDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            {
-                var context =
-                    serviceScope.ServiceProvider.GetService<WorkoutTrackerContext>();
-                context.Database.EnsureCreated();
-
-                try
-                {
-                    context.AddRange(SeedData.ExerciseMuscleGroups);
-                    context.SaveChanges();
-                }
-                catch
-                {
-                    Console.WriteLine("Problem seeding database");
-                }
-                
             }
         }
     }

@@ -26,6 +26,7 @@ namespace WorkoutTracker.Infra
                 e.HasKey(p => p.Id);
                 e.Property(p => p.Id).ValueGeneratedOnAdd();
                 e.Property(p => p.Name).IsRequired();
+                e.HasIndex(p => p.Name).IsUnique();
                 e.Property(p => p.Description);
                 e.Property(p => p.VideoLink);
 
@@ -37,6 +38,7 @@ namespace WorkoutTracker.Infra
                 m.HasKey(p => p.Id);
                 m.Property(p => p.Id).ValueGeneratedOnAdd();
                 m.Property(p => p.Name).IsRequired();
+                m.HasIndex(p => p.Name).IsUnique();
 
                 m.Ignore(p => p.Exercises);
             });
