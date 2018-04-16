@@ -92,7 +92,13 @@ namespace WorkoutTracker
             if (Uri.TryCreate(urlString, UriKind.Absolute, out var uri))
             {
                 var userInfo = uri.UserInfo.Split(':');
-                return $"host={uri.Host};username={userInfo[0]};password={userInfo[1]};database={uri.LocalPath.Substring(1)};pooling=true;";
+                var connectionString = $"host={uri.Host};username={userInfo[0]};password={userInfo[1]};database={uri.LocalPath.Substring(1)};pooling=true;";
+                if (!uri.IsLoopback)
+                {
+                    connectionString += "SSL Mode=Require;Trust Server Certificate=true;";
+                }
+                    
+                return connectionString;
             }
             else
             {
