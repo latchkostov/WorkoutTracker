@@ -12,6 +12,8 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
+        "DATABASE_URL": "postgres://admin:password@localhost:5432/workouttracker",
+        "SEED_DATABASE": "true",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 using WorkoutTracker.Infra;
 using WorkoutTracker.Services;
@@ -28,7 +29,13 @@ namespace WorkoutTracker
                     Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
 
-            string connectionString = "Server=localhost;Database=WorkoutTracker;Username=admin;Password=password;";
+            var DATABASE_URL = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+            if (String.IsNullOrWhiteSpace(DATABASE_URL))
+                throw new ArgumentException("DATABASE_URL environment variable required for Postgres SQL string.");
+
+            string connectionString = ConvertPostgresUrlToConnectionString(DATABASE_URL);
+
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<WorkoutTrackerContext>(options => options.UseNpgsql(connectionString));
 
@@ -77,7 +84,25 @@ namespace WorkoutTracker
                 }
             });
 
-            SeedDatabase(app);
+            var SEED_DATABASE = Environment.GetEnvironmentVariable("SEED_DATABASE");
+
+            if (!String.IsNullOrWhiteSpace(SEED_DATABASE) && SEED_DATABASE.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+            {
+                SeedDatabase(app);
+            }
+        }
+
+        private string ConvertPostgresUrlToConnectionString(string urlString)
+        {
+            if (Uri.TryCreate(urlString, UriKind.Absolute, out var uri))
+            {
+                var userInfo = uri.UserInfo.Split(':');
+                return $"host={uri.Host};username={userInfo[0]};password={userInfo[1]};database={uri.LocalPath.Substring(1)};pooling=true;";
+            }
+            else
+            {
+                throw new ArgumentException("Unable to parse Postgres SQL.", nameof(urlString));
+            }
         }
 
         private void SeedDatabase(IApplicationBuilder app)
@@ -86,11 +111,18 @@ namespace WorkoutTracker
             {
                 var context =
                     serviceScope.ServiceProvider.GetService<WorkoutTrackerContext>();
-                context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                context.AddRange(SeedData.ExerciseMuscleGroups);
-                context.SaveChanges();
+                try
+                {
+                    context.AddRange(SeedData.ExerciseMuscleGroups);
+                    context.SaveChanges();
+                }
+                catch
+                {
+                    Console.WriteLine("Problem seeding database");
+                }
+                
             }
         }
     }
