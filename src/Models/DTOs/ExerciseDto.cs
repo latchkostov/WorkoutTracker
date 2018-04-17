@@ -15,6 +15,11 @@ namespace WorkoutTracker.Models.DTOs
         public string Description { get; set; }
 
         /// <summary>
+        /// A link to a demonstration video of this exercise.
+        /// </summary>
+        public string VideoLink { get; set; }
+
+        /// <summary>
         /// The muscle groups which this exercise develops.
         /// </summary>
         public IEnumerable<MuscleGroupDto> MuscleGroups { get; set; }
