@@ -46,7 +46,7 @@ namespace WorkoutTracker.Controllers
         }
 
         [HttpGet("{name}")]
-        public async Task<IActionResult> GetExerciseById(string name)
+        public async Task<IActionResult> GetExerciseByName(string name)
         {
             var entity = await _exerciseService.Get(name);
 
