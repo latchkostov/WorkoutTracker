@@ -20,7 +20,23 @@ namespace WorkoutTracker.Services
         {
             _context = context;
         }
-        
+
+        public async Task<Exercise> Get(int id)
+        {
+            return await _context.Exercises
+                .Include(exercise => exercise.ExerciseMuscleGroups)
+                    .ThenInclude(x => x.MuscleGroup)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Exercise> Get(string name)
+        {
+            return await _context.Exercises
+                .Include(exercise => exercise.ExerciseMuscleGroups)
+                    .ThenInclude(x => x.MuscleGroup)
+                .FirstOrDefaultAsync(x => x.Name == name);
+        }
+
         /// <summary>
         /// Retrives all exercises.
         /// </summary>

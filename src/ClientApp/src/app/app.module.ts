@@ -13,12 +13,14 @@ import { ExerciseListComponent } from './components/exercise-list/exercise-list.
 import { ExerciseService } from './services/exercise.service';
 import { MuscleGroupService } from './services/muscle-group.service';
 import { AppNavbarComponent } from './components/app-navbar/app-navbar.component';
+import { ExerciseDetailsComponent } from './components/exercise-details/exercise-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ExerciseListComponent,
-    AppNavbarComponent
+    AppNavbarComponent,
+    ExerciseDetailsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -29,6 +31,8 @@ import { AppNavbarComponent } from './components/app-navbar/app-navbar.component
     RadioButtonModule,
     RouterModule.forRoot([
       { path: '', component: ExerciseListComponent, pathMatch: 'full' },
+      { path: 'exercises', component: ExerciseListComponent },
+      { path: 'exercise/:id', component: ExerciseDetailsComponent, pathMatch: 'full' }
     ])
   ],
   providers: [ExerciseService, MuscleGroupService],

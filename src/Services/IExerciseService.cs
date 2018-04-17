@@ -8,5 +8,9 @@ namespace WorkoutTracker.Services
     public interface IExerciseService
     {
         Task<IEnumerable<Exercise>> GetAll();
+
+        Task<Exercise> Get(int id);
+
+        Task<Exercise> Get(string name);
     }
 }

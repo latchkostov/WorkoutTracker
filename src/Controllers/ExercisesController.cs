@@ -19,7 +19,7 @@ namespace WorkoutTracker.Controllers
             _exerciseService = exerciseService;
             _mapper = mapper;
         }
-        
+
         /// <summary>
         /// Retrieves a list of all of the exercises.
         /// </summary>
@@ -30,7 +30,31 @@ namespace WorkoutTracker.Controllers
             var entities = await _exerciseService.GetAll();
 
             var result = _mapper.Map<IEnumerable<ExerciseDto>>(entities);
-            return Json(result);
+            return Ok(result);
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetExerciseById(int id)
+        {
+            var entity = await _exerciseService.Get(id);
+
+            if (entity == null)
+                return NotFound();
+
+            var result = _mapper.Map<ExerciseDto>(entity);
+            return Ok(result);
+        }
+
+        [HttpGet("{name}")]
+        public async Task<IActionResult> GetExerciseByName(string name)
+        {
+            var entity = await _exerciseService.Get(name);
+
+            if (entity == null)
+                return NotFound();
+
+            var result = _mapper.Map<ExerciseDto>(entity);
+            return Ok(result);
         }
     }
 }
