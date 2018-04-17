@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WorkoutTracker.Models
+namespace WorkoutTracker.Models.Entities
 {
     /// <summary>
     /// Entity for many-to-many relation of Exercises and Muscle Groups.
