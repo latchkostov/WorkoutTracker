@@ -43,6 +43,7 @@
             <th>Name</th>
             <th>Description</th>
             <th>Demonstration</th>
+            <th>Details</th>
           </tr>
         </thead>
         <tbody>
@@ -51,6 +52,8 @@
             <td>{{exercise.name}}</td>
             <td>{{exercise.description}}</td>
             <td><a href="{{exercise.videoLink}}">{{exercise.videoLink}}</a></td>
+            <td><a [routerLink]="['/exercise/', exercise.id]">Details</a>
+          </td>
           </tr>
         </tbody>
       </table>

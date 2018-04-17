@@ -11,4 +11,8 @@ export class ExerciseService {
     return this.httpClient.get<IExercise[]>('api/exercises');
   }
 
+  getExercise(id: number) {
+    return this.httpClient.get<IExercise>('api/exercises/' + id);
+  }
+
 }

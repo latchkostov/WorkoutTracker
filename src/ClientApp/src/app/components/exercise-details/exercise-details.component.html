@@ -1,0 +1,16 @@
+<div *ngIf="exerciseObs | async as exercise else loading">
+  <div class="card">
+    <h5 class="card-header">
+      Exercise: {{ exercise.name }}
+    </h5>
+    <div class="card-body">
+      <span>{{ exercise.description }}</span>
+    </div>
+  </div>
+</div>
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>
+
+<br />
+<button (click)="goBackToAllExercises()" class="btn btn-default">Back</button>
