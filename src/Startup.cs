@@ -2,12 +2,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using WorkoutTracker.Infra;
 using WorkoutTracker.Services;
 
@@ -25,13 +23,6 @@ namespace WorkoutTracker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAutoMapper();
-
-            services.AddMvc().AddJsonOptions(options => {
-                options.SerializerSettings.ReferenceLoopHandling =
-                    Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            });
-
             var DATABASE_URL = Environment.GetEnvironmentVariable("DATABASE_URL");
 
             if (String.IsNullOrWhiteSpace(DATABASE_URL))
@@ -44,14 +35,7 @@ namespace WorkoutTracker
                     options.UseNpgsql(connectionString);
                 });
 
-            services.AddTransient<IExerciseService, ExerciseService>();
-            services.AddTransient<IMuscleGroupService, MuscleGroupService>();
-
-            // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            AddSharedServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -87,6 +71,27 @@ namespace WorkoutTracker
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }
+            });
+        }
+
+        public static void AddSharedServices(IServiceCollection services)
+        {
+            services.AddSingleton<IMapper>(new Mapper(
+                new MapperConfiguration(cfg => cfg.AddProfile<DomainProfile>())
+            ));
+
+            services.AddMvc().AddJsonOptions(options => {
+                options.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
+            services.AddTransient<IExerciseService, ExerciseService>();
+            services.AddTransient<IMuscleGroupService, MuscleGroupService>();
+
+            // In production, the Angular files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/dist";
             });
         }
 
