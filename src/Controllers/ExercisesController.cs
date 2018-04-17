@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using WorkoutTracker.Models.DTOs;
 using WorkoutTracker.Services;
 
 namespace WorkoutTracker.Controllers
@@ -9,10 +12,12 @@ namespace WorkoutTracker.Controllers
     public class ExercisesController : Controller
     {
         private readonly IExerciseService _exerciseService;
+        private readonly IMapper _mapper;
 
-        public ExercisesController(IExerciseService exerciseService)
+        public ExercisesController(IExerciseService exerciseService, IMapper mapper)
         {
             _exerciseService = exerciseService;
+            _mapper = mapper;
         }
         
         /// <summary>
@@ -22,8 +27,10 @@ namespace WorkoutTracker.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllExercises()
         {
-            var result = await _exerciseService.GetAll();
-            return Json(await _exerciseService.GetAll());
+            var entities = await _exerciseService.GetAll();
+
+            var result = _mapper.Map<IEnumerable<ExerciseDto>>(entities);
+            return Json(result);
         }
     }
 }
