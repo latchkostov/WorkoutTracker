@@ -1,4 +1,4 @@
-﻿namespace WorkoutTracker.Models
+﻿namespace WorkoutTracker.Models.Entities
 {
     /// <summary>
     /// Base model definition.

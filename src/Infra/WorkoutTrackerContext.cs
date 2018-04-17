@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WorkoutTracker.Models;
+using WorkoutTracker.Models.Entities;
 
 namespace WorkoutTracker.Infra
 {

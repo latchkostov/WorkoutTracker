@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WorkoutTracker.Infra;
 using WorkoutTracker.Models;
+using WorkoutTracker.Models.Entities;
 
 namespace WorkoutTracker.Services
 {

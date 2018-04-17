@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using WorkoutTracker.Models;
+using WorkoutTracker.Models.Entities;
 
 namespace WorkoutTracker.Infra
 {
