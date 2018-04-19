@@ -24,7 +24,6 @@ export class ExerciseListComponent implements OnInit, OnDestroy {
   addExerciseDescription: string;
 
   retrieveExercisesSub: Subscription;
-  retrieveMuscleGroupsSub: Subscription;
   addExerciseSub: Subscription;
 
   // Text filter bound property
@@ -38,7 +37,7 @@ export class ExerciseListComponent implements OnInit, OnDestroy {
   }
 
   // Multi-select dropdown bound property
-  muscleGroups: SelectItem[];
+  muscleGroupSelectItems: SelectItem[] = [];
   _selectedMuscleGroups: SelectItem[];
   get selectedMuscleGroups(): SelectItem[] {
     return this._selectedMuscleGroups;
@@ -68,27 +67,43 @@ export class ExerciseListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.retrieveExercises();
-    this.retrieveMuscleGroups();
   }
 
   retrieveExercises() {
     this.retrieveExercisesSub = this.exerciseService.getAllExercises().subscribe(data => {
       this.exercises = data;
       this.filteredExercises = this.exercises;
+
+      const distinctMuscleGroups = this.getDistinctMuscleGroupsFromExercises(this.exercises);
+      this.addMuscleGroupSelectItems(distinctMuscleGroups);
     });
   }
 
-  retrieveMuscleGroups() {
-    this.retrieveMuscleGroupsSub = this.muscleGroupService.getAllMuscleGroups().subscribe(data => {
-      this.muscleGroups = [];
-      for (const muscleGroup of data) {
-        this.muscleGroups.push(
-          {
-            label: muscleGroup.name,
-            value: { id: muscleGroup.id, name: muscleGroup.name }
-          });
+  addMuscleGroupSelectItems(muscleGroups: MuscleGroup[]): void {
+    for (const muscleGroup of muscleGroups) {
+      if (this.muscleGroupSelectItems.findIndex(x => x.value.id === muscleGroup.id) === -1) {
+        this.muscleGroupSelectItems.push(
+        {
+          label: muscleGroup.name,
+          value: { id: muscleGroup.id, name: muscleGroup.name }
+        });
       }
-    });
+    }
+  }
+
+  getDistinctMuscleGroupsFromExercises(exercises: IExercise[]): MuscleGroup[] {
+    const distinctMuscleGroups: MuscleGroup[] = [];
+    for (const exercise of this.exercises) {
+      if (exercise.muscleGroups) {
+        for (const muscleGroup of exercise.muscleGroups) {
+          if (distinctMuscleGroups.findIndex(x => x.id === muscleGroup.id) === -1) {
+            distinctMuscleGroups.push(muscleGroup);
+          }
+        }
+      }
+    }
+
+    return distinctMuscleGroups;
   }
 
   performFiltering() {
@@ -183,9 +198,6 @@ export class ExerciseListComponent implements OnInit, OnDestroy {
   unsubscribe(): void {
     if (this.retrieveExercisesSub) {
       this.retrieveExercisesSub.unsubscribe();
-    }
-    if (this.retrieveMuscleGroupsSub) {
-      this.retrieveMuscleGroupsSub.unsubscribe();
     }
     if (this.addExerciseSub) {
       this.addExerciseSub.unsubscribe();
