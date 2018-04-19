@@ -12,5 +12,7 @@ namespace WorkoutTracker.Services
         Task<Exercise> Get(int id);
 
         Task<Exercise> Get(string name);
+
+        Task<Exercise> Add(string name, string description);
     }
 }

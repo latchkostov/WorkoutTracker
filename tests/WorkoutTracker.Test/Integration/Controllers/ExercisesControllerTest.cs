@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using WorkoutTracker.Models.DTOs;
@@ -77,6 +78,63 @@ namespace WorkoutTracker.Test.Integration.Controllers
             var response = await _client.GetAsync($"{BASE_CONTROLLER_ROUTE}some_name");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration.ExercisesController")]
+        public async Task Add_Success_Created()
+        {
+            var model = new ExerciseAddDto
+            {
+                Name = "test name",
+                Description = "test description"
+            };
+
+            var postContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync(BASE_CONTROLLER_ROUTE, postContent);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration.ExercisesController")]
+        public async Task Add_AlreadyExists_Conflict()
+        {
+            // Seed an exercise
+            var name = "test";
+            var description = "test";
+
+            var exercise = CreateExercise(name, description);
+
+            // Prepare model for POST
+            var model = new ExerciseAddDto
+            {
+                Name = name,
+                Description = description
+            };
+
+            var postContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            // POST
+            var response = await _client.PostAsync(BASE_CONTROLLER_ROUTE, postContent);
+
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration.ExercisesController")]
+        public async Task Add_InvalidBody_BadRequest()
+        {
+            // Seed an exercise
+            var name = "test";
+            var description = "test";
+
+            var exercise = CreateExercise(name, description);
+
+            var postContent = new StringContent(JsonConvert.SerializeObject(new { hello = "world" }), Encoding.UTF8, "application/json");
+            // POST
+            var response = await _client.PostAsync(BASE_CONTROLLER_ROUTE, postContent);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         private Exercise CreateExercise(string name, string description)
