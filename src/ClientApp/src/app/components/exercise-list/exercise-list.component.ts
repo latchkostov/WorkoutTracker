@@ -1,19 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { IExercise } from '../../models/Exercise';
 import { SelectItem } from 'primeng/api';
 import { MuscleGroup } from '../../models/MuscleGroup';
 import { ExerciseService } from '../../services/exercise.service';
 import { MuscleGroupService } from '../../services/muscle-group.service';
+import { ExerciseAddDialogComponent } from '../exercise-add-dialog/exercise-add-dialog.component';
+import { ExerciseAddDto } from '../../models/ExerciseAddDto';
+import { Subscription } from 'rxjs/Subscription';
+import { Message } from 'primeng/api';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 @Component({
   selector: 'app-exercise-list',
   templateUrl: './exercise-list.component.html',
   styleUrls: ['./exercise-list.component.css']
 })
-export class ExerciseListComponent implements OnInit {
+export class ExerciseListComponent implements OnInit, OnDestroy {
 
   exercises: IExercise[];
   filteredExercises: IExercise[];
+  addExerciseName: string;
+  addExerciseDescription: string;
+
+  retrieveExercisesSub: Subscription;
+  retrieveMuscleGroupsSub: Subscription;
+  addExerciseSub: Subscription;
 
   // Text filter bound property
   _searchValue = '';
@@ -48,14 +60,26 @@ export class ExerciseListComponent implements OnInit {
 
   constructor(
     private exerciseService: ExerciseService,
-    private muscleGroupService: MuscleGroupService
+    private muscleGroupService: MuscleGroupService,
+    public dialog: MatDialog,
+    private messageService: MessageService
   ) {
-    this.exerciseService.getAllExercises().subscribe(data => {
+  }
+
+  ngOnInit() {
+    this.retrieveExercises();
+    this.retrieveMuscleGroups();
+  }
+
+  retrieveExercises() {
+    this.retrieveExercisesSub = this.exerciseService.getAllExercises().subscribe(data => {
       this.exercises = data;
       this.filteredExercises = this.exercises;
     });
+  }
 
-    this.muscleGroupService.getAllMuscleGroups().subscribe(data => {
+  retrieveMuscleGroups() {
+    this.retrieveMuscleGroupsSub = this.muscleGroupService.getAllMuscleGroups().subscribe(data => {
       this.muscleGroups = [];
       for (const muscleGroup of data) {
         this.muscleGroups.push(
@@ -122,7 +146,53 @@ export class ExerciseListComponent implements OnInit {
     return false;
   }
 
-  ngOnInit() {
+  openAddExerciseDialog(): void {
+    const dialogRef = this.dialog.open(ExerciseAddDialogComponent, {
+      width: '250px',
+      data: { exerciseName: this.addExerciseName, exerciseDescription: this.addExerciseDescription }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.exerciseName && result.exerciseDescription) {
+        const exerciseName: string = result.exerciseName.trim();
+        const exerciseDescription: string = result.exerciseDescription.trim();
+
+        if (exerciseName.length > 0 && exerciseDescription.length > 0) {
+          const model = new ExerciseAddDto(exerciseName, exerciseDescription);
+          this.exerciseService.addExercise(model).subscribe(
+            data => {
+              this.retrieveExercises();
+            },
+            error => {
+              // Error
+              if (error.status === 409) {
+                console.log('Excercise with name already exists');
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Exercise exists',
+                  detail: 'Exercise with name ' + exerciseName + 'already exists'
+                });
+              }
+            }
+          );
+        }
+      }
+    });
   }
 
+  unsubscribe(): void {
+    if (this.retrieveExercisesSub) {
+      this.retrieveExercisesSub.unsubscribe();
+    }
+    if (this.retrieveMuscleGroupsSub) {
+      this.retrieveMuscleGroupsSub.unsubscribe();
+    }
+    if (this.addExerciseSub) {
+      this.addExerciseSub.unsubscribe();
+    }
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe();
+  }
 }

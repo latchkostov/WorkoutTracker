@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WorkoutTracker.Exceptions;
 using WorkoutTracker.Infra;
 using WorkoutTracker.Models;
 using WorkoutTracker.Models.Entities;
@@ -19,6 +20,27 @@ namespace WorkoutTracker.Services
         public ExerciseService(WorkoutTrackerContext context)
         {
             _context = context;
+        }
+
+        public async Task<Exercise> Add(string name, string description)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(name);
+            if (string.IsNullOrWhiteSpace(description)) throw new ArgumentNullException(description);
+
+            var exercise = await Get(name);
+
+            if (exercise != null) throw new EntityExistsException($"Exercise with name {name} already exists.");
+
+            exercise = new Exercise
+            {
+                Name = name,
+                Description = description
+            };
+
+            _context.Exercises.Add(exercise);
+            await _context.SaveChangesAsync();
+
+            return exercise;
         }
 
         public async Task<Exercise> Get(int id)

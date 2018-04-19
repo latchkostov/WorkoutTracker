@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Add Exercise</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <input matInput placeholder="Name" [(ngModel)]="data.exerciseName">
+  </mat-form-field>
+  <mat-form-field>
+    <textarea matInput placeholder="Description" [(ngModel)]="data.exerciseDescription"></textarea>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+</div>
