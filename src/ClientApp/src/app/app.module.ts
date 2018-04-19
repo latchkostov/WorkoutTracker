@@ -1,56 +1,37 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatFormFieldModule, MatDialogModule, MatInputModule } from '@angular/material';
-
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { GrowlModule } from 'primeng/growl';
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
-import { ExerciseListComponent } from './components/exercise-list/exercise-list.component';
-import { ExerciseService } from './services/exercise.service';
-import { MuscleGroupService } from './services/muscle-group.service';
 import { AppNavbarComponent } from './components/app-navbar/app-navbar.component';
-import { ExerciseDetailsComponent } from './components/exercise-details/exercise-details.component';
-import { ExerciseAddDialogComponent } from './components/exercise-add-dialog/exercise-add-dialog.component';
-import { MessageService } from 'primeng/components/common/messageservice';
+import { HomeComponent } from './components/home/home.component';
+
+import { SharedModule } from './modules/shared.module';
+import { ExerciseModule } from './modules/exercise.module';
+import { MuscleGroupModule } from './modules/muscle-group.module';
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    ExerciseListComponent,
     AppNavbarComponent,
-    ExerciseDetailsComponent,
-    ExerciseAddDialogComponent
+    HomeComponent
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
-    FormsModule,
-    GrowlModule,
-    HttpClientModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatDialogModule,
-    MatInputModule,
-    MultiSelectModule,
-    NgbModule.forRoot(),
-    RadioButtonModule,
     RouterModule.forRoot([
-      { path: '', component: ExerciseListComponent, pathMatch: 'full' },
-      { path: 'exercises', component: ExerciseListComponent },
-      { path: 'exercise/:id', component: ExerciseDetailsComponent, pathMatch: 'full' }
-    ])
+      { path: '', component: HomeComponent },
+      { path: '**', component: HomeComponent }
+    ]),
+    ExerciseModule,
+    SharedModule,
+    MuscleGroupModule,
   ],
-  entryComponents: [
-    ExerciseAddDialogComponent
+  exports: [
   ],
-  providers: [ExerciseService, MuscleGroupService, MessageService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
